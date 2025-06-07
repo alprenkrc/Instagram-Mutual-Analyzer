@@ -54,6 +54,7 @@ A powerful tool that helps you discover potential Instagram connections by analy
 
 ### 🔍 Instagram Ortak Bağlantı Analiz Aracı
 
+Instagram'da takipleşmediğiniz ama en çok ortak takipçileriniz olan hesapları gösteren araç
 Takipçileriniz ve takip ettikleriniz arasındaki ortak bağlantıları analiz ederek potansiyel Instagram bağlantılarını keşfetmenize yardımcı olan güçlü bir araç.
 
 ### Özellikler
