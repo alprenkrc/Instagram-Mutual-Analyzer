@@ -2,6 +2,8 @@
 
 [English](#english) | [Türkçe](#türkçe)
 
+![SS](https://github.com/alprenkrc/Instagram-Mutual-Analyzer/blob/main/Screen%20Shots/ss1.png)
+
 ## English
 
 ### 🔍 Instagram Mutual Analyzer
