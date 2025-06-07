@@ -2,7 +2,7 @@
 
 [English](#english) | [Türkçe](#türkçe)
 
-![SS](https://github.com/alprenkrc/Instagram-Mutual-Analyzer/blob/main/Screen%20Shots/ss1.png)
+![SS](https://github.com/alprenkrc/Instagram-Mutual-Analyzer/blob/main/Screen%20Shots/ss2.png)
 
 ## English
 
