@@ -5,8 +5,11 @@ async function createMutualAnalyzer() {
         tr: {
             title: 'Instagram Mutual Analyzer',
             minMutualLabel: 'Minimum ortak arkadaş sayısı:',
-            exceptionListLabel: 'İstisna hesaplar (virgülle ayırın):',
-            exceptionListPlaceholder: 'örn: username1, username2',
+            exceptionListLabel: 'İstisna hesaplar:',
+            exceptionInputPlaceholder: 'Kullanıcı adı',
+            addButton: 'Ekle',
+            removeButton: 'Sil',
+            noExceptionsYet: 'Henüz istisna hesap eklenmedi',
             exceptionListHelp: 'Çok fazla takip eden/edilen hesapları buraya ekleyerek analiz dışında bırakabilirsiniz.',
             startAnalysis: 'Analizi Başlat',
             analyzing: 'Analiz Yapılıyor...',
@@ -27,13 +30,17 @@ async function createMutualAnalyzer() {
             second: 'saniye',
             processing: 'İşleniyor...',
             stopAnalysis: 'Analizi Durdur',
-            analysisStopped: 'Analiz durduruldu.'
+            analysisStopped: 'Analiz durduruldu.',
+            skipped: 'atlandı'
         },
         en: {
             title: 'Instagram Mutual Analyzer',
             minMutualLabel: 'Minimum mutual friends:',
-            exceptionListLabel: 'Exception accounts (comma separated):',
-            exceptionListPlaceholder: 'e.g., username1, username2',
+            exceptionListLabel: 'Exception accounts:',
+            exceptionInputPlaceholder: 'Username',
+            addButton: 'Add',
+            removeButton: 'Remove',
+            noExceptionsYet: 'No exception accounts added yet',
             exceptionListHelp: 'Add accounts with too many followers/following here to exclude them from analysis.',
             startAnalysis: 'Start Analysis',
             analyzing: 'Analyzing...',
@@ -54,12 +61,67 @@ async function createMutualAnalyzer() {
             second: 'second',
             processing: 'Processing...',
             stopAnalysis: 'Stop Analysis',
-            analysisStopped: 'Analysis stopped.'
+            analysisStopped: 'Analysis stopped.',
+            skipped: 'skipped'
         }
     };
 
     // Dil seçimi için kullanıcı tercihi (varsayılan: tr)
     let currentLang = localStorage.getItem('mutualAnalyzerLang') || 'tr';
+    
+    // İstisna hesaplar listesi
+    let exceptionAccounts = [];
+
+    // İstisna hesap ekleme fonksiyonu
+    function addExceptionAccount(username) {
+        username = username.trim().toLowerCase();
+        if (username && !exceptionAccounts.includes(username)) {
+            exceptionAccounts.push(username);
+            updateExceptionDisplay();
+        }
+    }
+
+    // İstisna hesap silme fonksiyonu
+    function removeExceptionAccount(username) {
+        const index = exceptionAccounts.indexOf(username);
+        if (index > -1) {
+            exceptionAccounts.splice(index, 1);
+            updateExceptionDisplay();
+        }
+    }
+
+    // İstisna hesaplar görüntüsünü güncelleme fonksiyonu
+    function updateExceptionDisplay() {
+        const listDiv = document.getElementById('exception-list');
+        if (exceptionAccounts.length === 0) {
+            listDiv.innerHTML = `<small style="color: #8e8e8e;">${t('noExceptionsYet')}</small>`;
+        } else {
+            listDiv.innerHTML = exceptionAccounts.map(username => `
+                <div style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    background: white;
+                    padding: 6px 10px;
+                    margin-bottom: 4px;
+                    border-radius: 4px;
+                    border: 1px solid #dbdbdb;
+                ">
+                    <span style="color: #262626; font-weight: 500;">@${username}</span>
+                    <button onclick="removeExceptionAccount('${username}')" style="
+                        background: #ed4956;
+                        color: white;
+                        border: none;
+                        padding: 2px 6px;
+                        border-radius: 3px;
+                        cursor: pointer;
+                        font-size: 11px;
+                        font-weight: 600;
+                    ">${t('removeButton')}</button>
+                </div>
+            `).join('');
+        }
+    }
 
     // Metin çeviri fonksiyonu
     function t(key, replacements = {}) {
@@ -147,15 +209,36 @@ async function createMutualAnalyzer() {
         </div>
         <div style="margin-bottom: 10px;">
             <label style="display: block; margin-bottom: 5px; color: #262626; font-weight: 600;">${t('exceptionListLabel')}</label>
-            <textarea id="exception-list" placeholder="${t('exceptionListPlaceholder')}" style="
-                color: #262626;
-                width: 100%;
-                padding: 8px;
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <input type="text" id="exception-input" placeholder="${t('exceptionInputPlaceholder')}" style="
+                    color: #262626;
+                    flex: 1;
+                    padding: 8px;
+                    border: 1px solid #dbdbdb;
+                    border-radius: 4px;
+                ">
+                <button id="add-exception" type="button" style="
+                    background: #0095f6;
+                    color: white;
+                    border: none;
+                    padding: 8px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    white-space: nowrap;
+                ">${t('addButton')}</button>
+            </div>
+            <div id="exception-list" style="
+                min-height: 40px;
                 border: 1px solid #dbdbdb;
                 border-radius: 4px;
-                min-height: 60px;
-                resize: vertical;
-            "></textarea>
+                padding: 8px;
+                background: #fafafa;
+                max-height: 120px;
+                overflow-y: auto;
+            ">
+                <small style="color: #8e8e8e;">${t('noExceptionsYet')}</small>
+            </div>
             <small style="color: #8e8e8e; display: block; margin-top: 4px;">
                 ${t('exceptionListHelp')}
             </small>
@@ -243,6 +326,9 @@ async function createMutualAnalyzer() {
     container.appendChild(results);
     document.body.appendChild(container);
 
+    // Fonksiyonları global hale getir
+    window.removeExceptionAccount = removeExceptionAccount;
+
     // Dil değiştirme event listener'ı
     document.getElementById('lang-selector').addEventListener('change', (e) => {
         currentLang = e.target.value;
@@ -255,13 +341,31 @@ async function createMutualAnalyzer() {
         container.remove();
     });
 
+    // İstisna hesap ekleme event listener'ları
+    document.getElementById('add-exception').addEventListener('click', () => {
+        const input = document.getElementById('exception-input');
+        const username = input.value.trim();
+        if (username) {
+            addExceptionAccount(username);
+            input.value = '';
+        }
+    });
+
+    document.getElementById('exception-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const username = e.target.value.trim();
+            if (username) {
+                addExceptionAccount(username);
+                e.target.value = '';
+            }
+        }
+    });
+
     document.getElementById('start-analysis').addEventListener('click', async () => {
         isAnalysisStopped = false; // Analiz başlarken flag'i sıfırla
         const minMutual = parseInt(document.getElementById('min-mutual').value) || 2;
-        const exceptionList = document.getElementById('exception-list').value
-            .split(',')
-            .map(username => username.trim())
-            .filter(username => username.length > 0);
+        const exceptionList = [...exceptionAccounts]; // İstisna hesapları kopyala
         const startButton = document.getElementById('start-analysis');
         const progressDiv = progress;
         const resultsDiv = document.getElementById('analysis-results');
@@ -598,13 +702,20 @@ async function createMutualAnalyzer() {
                     return;
                 }
 
+                // İstisna listesinde yer alan hesapları atla
+                if (exceptionList.includes(followedUsername.toLowerCase())) {
+                    processedCount++;
+                    updateProgress(processedCount, following.size, `@${followedUsername} (${t('skipped')})`);
+                    continue;
+                }
+
                 processedCount++;
                 updateProgress(processedCount, following.size, followedUsername);
                 
                 const theirFollowing = await getUserFollowing(followedId);
                 
                 for (const [potentialId, potentialUsername] of theirFollowing) {
-                    if (exceptionList.includes(potentialUsername)) {
+                    if (exceptionList.includes(potentialUsername.toLowerCase())) {
                         continue;
                     }
 
@@ -656,6 +767,10 @@ async function createMutualAnalyzer() {
             resultsDiv.innerHTML = `<div style="color: red; padding: 10px;">${t('error')} ${error.message}</div>`;
         }
     }
+}
+
+// Analiz arayüzünü başlat
+createMutualAnalyzer(); 
 }
 
 // Analiz arayüzünü başlat
