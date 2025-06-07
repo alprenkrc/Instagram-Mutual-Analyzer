@@ -771,7 +771,6 @@ async function createMutualAnalyzer() {
 
 // Analiz arayüzünü başlat
 createMutualAnalyzer(); 
-}
 
 // Analiz arayüzünü başlat
 createMutualAnalyzer(); 
